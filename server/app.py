@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 # Add your model imports
 
 from config import app, db, api
-from models import Video, User
+from models import Video, User, Review
 
 # Views go here!
 # app = Flask(__name__)

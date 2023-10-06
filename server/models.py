@@ -1,62 +1,55 @@
-#!/usr/bin/env python3
-
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.ext.associationproxy import association_proxy
 
-from config import db, bcrypt
-# from db import PrimaryKeyConstraint
-# Models go here!
-video_user = db.Table(
-    'videos_users',
-    db.Column('user_id',db.Integer, db.ForeignKey('users.id')),
-    db.Column('video_id',db.Integer,db.ForeignKey('videos.id'))
-)
+metadata = MetaData(naming_convention={
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+})
 
-
-class User(db.Model, SerializerMixin):
-    __tablename__ = "users"
-
-    serialize_rules = ("-reviews.user",)
-    id = db.Column(db.Integer, primary_key= True)
-    username=db.Column(db.String, unique=True, nullable=False)
-    _password_hash =db.Column(db.String)
-    video_url=db.Column(db.String)
-    reviews = db.relationship('Review', backref='user')
-    videos = db.relationship('Video',secondary=video_user,back_populates='users')
-    
-
-    def __repr__(self):
-        return f'<user {self.id}: {self.username}>'
-
-
+db = SQLAlchemy(metadata=metadata)
 
 class Video(db.Model, SerializerMixin):
-    __tablename__ = "videos"
+    __tablename__ = 'videos'
 
-    serialize_rules = ("-user.videos",)
+    serialize_rules = ('-reviews.video',)
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
-    views = db.Column(db.Integer)
-    publish_at = db.Column(db.DateTime,server_default=db.func.now())
+    title = db.Column(db.String, unique=True)
+    
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    users = db.relationship('User',secondary=video_user,back_populates='videos')
-    reviews = db.relationship('Review',backref='video')
+    reviews = db.relationship('Review', backref='video')
+
     def __repr__(self):
-        return f'video {self.id}: {self.title}'
+        return f'<video {self.title} for {self.platform}>'
 
 class Review(db.Model, SerializerMixin):
-    __tablename__ = "reviews"
-    __table_args__= (db.CheckConstraint('LENGTH(review) >= 25'),)
-    serialize_rules = ('-user.reviews','-video.reviews',)
-    id == db.Column(db.Integer(), primary_key=True)
-    comment = db.Column(db.String,nullable=False)
-    # created_at = db.Column(db.DateTime, server_default=db.func.now())
-    # updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+    __tablename__ = 'reviews'
 
-    video_id = db.Column(db.Integer, db.ForeignKey('videos.id'),)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),)
+    serialize_rules = ('-video.reviews', '-user.reviews',)
+    
+    id = db.Column(db.Integer, primary_key=True)
+   
+    comment = db.Column(db.String)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
+    video_id = db.Column(db.Integer, db.ForeignKey('videos.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __repr__(self):
-        return f'Review {self.id}: {self.comment}'
+        return f'<Review ({self.id}) of {self.video}: {self.score}/10>'
+
+class User(db.Model, SerializerMixin):
+    __tablename__ = 'users'
+
+    serialize_rules = ('-reviews.user',)
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
+    reviews = db.relationship('Review', backref='user')
