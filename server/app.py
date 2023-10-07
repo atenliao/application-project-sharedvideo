@@ -4,44 +4,107 @@
 from flask import request, session
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
-# from flask import Flask, request, make_response
-# from flask_sqlalchemy import SQLAlchemy
-# from flask_migrate import Migrate
-# from flask import Flask
-# from flask_cors import CORS
-# from flask_bcrypt import Bcrypt
-# from flask_restful import Api
-# Remote library imports
-# from flask import request
-# from flask_restful import Resource
-# from models import db
-# Local imports
 from config import app, db, api
-# Add your model imports
 
-# from config import app, db, api
 from models import Video, User, Review
 
-# Views go here!
-# app = Flask(__name__)
-# app.secret_key = b'Y\xf1Xz\x00\xad|eQ\x80t \xca\x1a\x10K'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.json.compact = False
+
+class Signup(Resource):
+    def post(self):
+        request_json = request.get_json()
+        username = request_json.get('username')
+        password = request_json.get('password')
+        image_url = request_json.get('image_url')
+
+        user = User(
+            username = username,
+            image_url = image_url
+        )
+        user.password_hash = password
+
+        print('user post ')
+        try:
+            print('here!')
+            db.session.add(user)
+            db.session.commit()
+
+            session['user_id']= user.id
+            print(user.to_dict())
+            return user.to_dict(), 201
+
+        except IntegrityError:
+            print("no,here!")
+            return {'error':'422 Unprocessable Entity'},422
+
+class CheckSession(Resource):
+    def get(self):
+        if session.get('user_id'):
+            user = User.query.filter(User.id == session['user_id']).first()
+            return user.to_dict(), 200
+
+        return {'error':'401 Unauthorized'}, 401
 
 
-# migrate = Migrate(app, db)
+class Login(Resource):
+    def post(self):
+        request_json = request.get_json()
+        username = request_json.get('username')
+        password = request_json.get('password')
+        user = User.query.filter(User.username == username).first()
 
-# api = Api(app)
 
-# bcrypt = Bcrypt(app)
-# # Instantiate CORS
-# CORS(app)
-# db.init_app(app)
+        if user:
+            if user.authenticate(password):
+                session['user_id'] = user.id
+                return user.to_dict(), 200
+        
+        return {'error': '401 Unauthorized'}, 401
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
+
+class Logout(Resource):
+    def delete(self):
+        if session.get('user_id'):
+            session['user_id'] = None
+
+            return {}, 204
+
+        return {'error': '401 Unauthorized'}, 401
+
+class VideoIndex(Resource):
+    def get(self):
+        if session.get('user_id'):
+            user = User.query.filter(User.id == session['user_id']).first()
+            return [video.to_dict() for video in user.videos], 200
+
+        return {'error':'401 Unauthorized'}, 401
+
+    def post(self):
+        if session.get('user_id'):
+            request_json = request.get_json()
+            title = request_json.get('title')
+            video_url = request_json.get('video_url')
+           
+            try:
+                video = Video(
+                    title = title,
+                    video_url = video_url,
+                    user_id = session['user_id'],
+                )
+
+                db.session.add(video)
+                db.session.commit()
+
+                return video.to_dict(), 201
+            except IntegrityError:
+                return {'error':'422 Unprocessable Entity'}, 422
+
+        return {'error':'401 Unauthorized'}, 401
+
+api.add_resource(Signup, '/signup', endpoint='signup')
+api.add_resource(CheckSession,'/check_session', endpoint='check_session')
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(VideoIndex,'/videos', endpoint='videos')
 
 
 if __name__ == '__main__':
