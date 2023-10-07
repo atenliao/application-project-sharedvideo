@@ -1,8 +1,8 @@
 """Create table
 
-Revision ID: 3531ddca0117
+Revision ID: cc0dbb714a3c
 Revises: 
-Create Date: 2023-10-06 01:17:25.674246
+Create Date: 2023-10-06 22:03:05.654565
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3531ddca0117'
+revision = 'cc0dbb714a3c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,15 +22,17 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=True),
-    sa.Column('video_url', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
     op.create_table('videos',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
+    sa.Column('video_url', sa.String(), nullable=True),
     sa.Column('views', sa.Integer(), nullable=True),
     sa.Column('publish_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_videos_user_id_users')),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('reviews',
