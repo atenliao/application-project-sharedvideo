@@ -55,3 +55,6 @@ __pycache__
 
 #database
 *.db
+*/*.db
+migrations
+instance
