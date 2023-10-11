@@ -12,7 +12,7 @@ function AllVideos(){
         fetch('/videos')
           .then((res)=>res.json())
           .then(setVideos)
-    })
+    },[])
     return (
         <Wrapper>
             {videos.map((video)=>(
