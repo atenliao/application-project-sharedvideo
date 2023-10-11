@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Standard library imports
-from flask import request, session
+from flask import request, session,jsonify, make_response
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from config import app, db, api
@@ -10,6 +10,11 @@ from models import Video, User, Review
 
 
 class Signup(Resource):
+    def get(self):
+        users = [user.to_dict() for user in User.query.all()]
+        return make_response(jsonify(users), 200)
+
+
     def post(self):
         request_json = request.get_json()
         username = request_json.get('username')
@@ -66,11 +71,17 @@ class Logout(Resource):
         if session.get('user_id'):
             session['user_id'] = None
 
-            return {}, 204
+            return {'message':'delete successfuly'}, 204
 
         return {'error': '401 Unauthorized'}, 401
 
 class VideoIndex(Resource):
+    def get(self):
+        
+        videos = [video.to_dict() for video in Video.query.all()]
+        return make_response(jsonify(videos),201)
+
+class VideoIndexByUserID(Resource):
     def get(self):
         if session.get('user_id'):
             user = User.query.filter(User.id == session['user_id']).first()
@@ -104,8 +115,8 @@ api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession,'/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
-api.add_resource(VideoIndex,'/videos', endpoint='videos')
-
+api.add_resource(VideoIndexByUserID,'/videos_userid', endpoint='videos_userid')
+api.add_resource(VideoIndex,'/videos',endpoint='videos')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

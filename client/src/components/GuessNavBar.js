@@ -1,21 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { Button, Label } from "../styles";
+import { Button } from "../styles";
 
 
-function NavBar({user, setUser }) {
-    function handleLogout() {
-        fetch("/logout", {
-            method: "DELETE"
-        })
-            .then((res) => {
-                if (res.ok) {
-                    setUser(null);
-                }
-            });
-    }
-
+function GuessNavBar({ user, setUser }) {
+    const [userLogin, setUserLogin] = useState(false)
+   
     return (
         <Wrapper>
             <Logo>
@@ -24,17 +15,11 @@ function NavBar({user, setUser }) {
             <Nav>
                 {
                     <>
-                    <Label htmlFor="User">
-                        {user.username}
-                    </Label>
-                        <Button as={Link} to="/new">
-                            Upload Video
+                        <Button as={Link} to="/login" onClick={() => setUserLogin(true)}>
+                            Login
                         </Button>
-                        <Button variant="outline" onClick={handleLogout}>
-                            Logout
-                        </Button>
+                        <Button as={Link} to="/signup" onClick={() => setUserLogin(false)}>Sign Up</Button>
                     </>
-
                 }
 
 
@@ -73,4 +58,4 @@ const Nav = styled.nav`
     right: 10px;
 `;
 
-export default NavBar;
+export default GuessNavBar;

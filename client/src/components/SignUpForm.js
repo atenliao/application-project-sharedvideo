@@ -2,18 +2,18 @@ import React, {useState} from "react";
 import {Button, Error, Input, FormField, Label } from "../styles";
 
 function SignUpForm({onLogin}) {
-    const [usename, setUsername] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [imageUrl, setImageUrl] = useState("");
-    const [error, setError] =useState([])
+    const [errors, setErrors] =useState([])
     const [isLoading,setIsLoading] = useState(false);
 
     function handleSubmit(e){
         e.preventDefault();
-        setError([]);
+        setErrors([]);
         setIsLoading(true);
-        fetch("/sigup",{
+        fetch("/signup",{
             method: "POST",
             headers: {
                 "Content-Type":"application/json",
@@ -29,7 +29,7 @@ function SignUpForm({onLogin}) {
             if(res.ok) {
                 res.json().then((user)=>onLogin(user));
             }else{
-                res.json().then((err) => setError(err.error));
+                res.json().then((err) => setErrors(err.errors));
             }
         })
     }
@@ -79,10 +79,12 @@ function SignUpForm({onLogin}) {
                 <Button type="submit">{isLoading ? "Loading...":"Sign Up"}</Button>
             </FormField>
             <FormField>
-                {error.map((err) =>(
+                {errors.map((err) =>(
                     <Error key={err}>{err}</Error>
                 ))}
             </FormField>
         </form>
     )
 }
+
+export default SignUpForm;

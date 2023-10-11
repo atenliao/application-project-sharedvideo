@@ -25,13 +25,13 @@ with app.app_context():
     usernames = []
     videos_url = [
         'https://www.youtube.com/watch?v=wcVnbnazVw4',
-        'https://www.youtube.com/watch?v=xc6vJ6T1N3o&list=RDxc6vJ6T1N3o&start_radio=1',
+        'https://www.youtube.com/watch?v=pRpeEdMmmQ0',
         'https://www.youtube.com/watch?v=Wv2G20Yeepk',
         'https://www.youtube.com/watch?v=j6B5lj3XRPg',
         'https://www.youtube.com/watch?v=oa-88Ge0XuY',
         'https://www.youtube.com/watch?v=xojsezpWiRI',
         'https://www.youtube.com/watch?v=IawwUQP8ztI',
-        'https://www.youtube.com/shorts/7bnOIOFvNs4',
+        'https://www.youtube.com/watch?v=9GCRa9vO4Uw',
         'https://www.youtube.com/watch?v=MGw5HgdzFS8',
         'https://www.youtube.com/watch?v=q7y4av-Dr4I',
         'https://www.youtube.com/watch?v=H8nERjGhpPk',
@@ -40,7 +40,21 @@ with app.app_context():
         'https://www.youtube.com/watch?v=Z0dD_M-WEOs',
         'https://www.youtube.com/watch?v=Pj5B1JZ3u_o',
         'https://www.youtube.com/watch?v=RX8ohg31Nek',
-        'https://www.youtube.com/watch?v=adC48qZ8p5Y'
+        'https://www.youtube.com/watch?v=adC48qZ8p5Y',
+        'https://www.youtube.com/watch?v=ZP4gie6zVUA',
+        'https://www.youtube.com/watch?v=kyTHWopOZ6Q',
+        'https://www.youtube.com/watch?v=KrLj6nc516A',
+        'https://www.youtube.com/watch?v=2O-9RmuiXog',
+        'https://www.youtube.com/watch?v=3w_svY7zTQM',
+        'https://www.youtube.com/watch?v=eXw54_C7AM4',
+        'https://www.youtube.com/watch?v=BGzGPyUKS1Q',
+        'https://www.youtube.com/watch?v=LI4uj9ulHQc',
+        'https://www.youtube.com/watch?v=muUL8kOqeyE',
+        'https://www.youtube.com/watch?v=NaptDLqIiU8',
+        'https://www.youtube.com/watch?v=Tp9qaP4RQZE',
+        'https://www.youtube.com/watch?v=79DijItQXMM',
+        'https://www.youtube.com/watch?v=PLPGIknFh54',
+        'https://www.youtube.com/watch?v=xpCkCBoIrnA',
 
     ]
     for i in range(20):
@@ -61,7 +75,7 @@ with app.app_context():
     videos = []
     for i in range(20):
         views = fake.pyint(0,100)
-        video_url = random.choice(videos_url)
+        video_url = videos_url[i]
         video = Video(
             title=fake.sentence(),
             video_url=video_url,

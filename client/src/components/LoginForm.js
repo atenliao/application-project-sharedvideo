@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import {Button, Error, Input, FormField, Label} from "../styles";
+import Login from "../pages/Login";
 
 function LoginForm({onLogin}){
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState([]);
+    const [errors, setErrors] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     function handleSubmit(e){
@@ -21,7 +22,7 @@ function LoginForm({onLogin}){
             if(res.ok) {
                 res.json().then((user)=>onLogin(user));
             }else {
-                res.json().then((err)=>setError(err.error));
+                res.json().then((err)=>setErrors(err.errors));
             }
         });
     }
@@ -62,3 +63,5 @@ function LoginForm({onLogin}){
     )
 
 }
+
+export default LoginForm
