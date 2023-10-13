@@ -5,14 +5,14 @@ import styled from "styled-components";
 import {Box, Button} from '../styles';
 
 
-function AllVideos(){
-    const [videos, setVideos] = useState([])
+function AllVideos({videos}){
+    // const [videos, setVideos] = useState([])
 
-    useEffect(()=>{
-        fetch('/videos')
-          .then((res)=>res.json())
-          .then(setVideos)
-    },[])
+    // useEffect(()=>{
+    //     fetch('/videos')
+    //       .then((res)=>res.json())
+    //       .then(setVideos)
+    // },[])
     return (
         <Wrapper>
             {videos.map((video)=>(
@@ -27,7 +27,7 @@ function AllVideos(){
                             &nbsp;·&nbsp;
                             <cite>By {video.user.username}</cite>
                         </p>
-                        {/* <Link to={`/videos/${video.id}`}>Learn more...</Link> */}
+                        <Link to={`/videopost/${video.id}`}>Learn more...</Link>
                         {/* <ReactMarkdown>{video.views}</ReactMarkdown> */}
                 </Video>
                 ))

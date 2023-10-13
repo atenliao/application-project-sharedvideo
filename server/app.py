@@ -81,6 +81,11 @@ class VideoIndex(Resource):
         videos = [video.to_dict() for video in Video.query.all()]
         return make_response(jsonify(videos),201)
 
+class VideoIndexByID(Resource):
+    def get(self,id):
+        video = Video.query.filter(Video.id == id).first()
+        return make_response(jsonify(video.to_dict()), 200)
+
 class VideoIndexByUserID(Resource):
     def get(self):
         if session.get('user_id'):
@@ -117,6 +122,7 @@ api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(VideoIndexByUserID,'/videos_userid', endpoint='videos_userid')
 api.add_resource(VideoIndex,'/videos',endpoint='videos')
+api.add_resource(VideoIndexByID,'/videos/<int:id>',endpoint='videos_id')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
